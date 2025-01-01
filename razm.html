@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Location Tracker</title>
+</head>
+<body>
+  <h1>Location Tracker</h1>
+  <p>Click the button below to share your location.</p>
+  <button id="getLocation">Get Location</button>
+  <p id="status"></p>
+
+  <script>
+    document.getElementById('getLocation').addEventListener('click', () => {
+      const status = document.getElementById('status');
+
+      if ('geolocation' in navigator) {
+        status.textContent = 'Getting location...';
+
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            status.textContent = `Location: ${latitude}, ${longitude}`;
+
+            // Send location to your server
+            fetch('https://your-server-url.com/location', { // https://glitch.com/@Rayan111222
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ latitude, longitude }),
+            })
+              .then((response) => response.text())
+              .then((data) => {
+                console.log('Server response:', data);
+              })
+              .catch((error) => {
+                console.error('Error:', error);
+              });
+          },
+          (error) => {
+            status.textContent = `Error: ${error.message}`;
+          }
+        );
+      } else {
+        status.textContent = 'Geolocation is not supported by this browser.';
+      }
+    });
+  </script>
+</body>
+</html>
